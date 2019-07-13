@@ -1,5 +1,3 @@
-require "byebug"
-
 class PolyTreeNode
     attr_reader :parent, :children, :value
 
@@ -11,20 +9,16 @@ class PolyTreeNode
 
     def inspect
         {'value' => @value}.inspect
-        # , 'parent' => @parent, 'children' => @children}.inspect
     end
+    
 
-    def parent=(node)
-        # debugger
-        if self.parent.nil?
-            @parent = node
-            parent.children << self
-        else
-            orig_parent = self.parent
-            orig_parent.children.delete(self)
-            @parent = node
-            parent.children << self unless parent.nil?
-        end
+    def parent=(new_parent)
+        old_parent = self.parent
+        old_parent.children.delete(self) unless old_parent.nil?
+
+        @parent = new_parent
+
+        new_parent.children << self unless new_parent.nil?
     end
 
     def add_child(child_node)
@@ -32,9 +26,7 @@ class PolyTreeNode
     end
 
     def remove_child(child_node)
-        if child_node.parent == nil
-            raise "this is not a kid"
-        end
+        raise "This is not a child node." if child_node.parent.nil?
         child_node.parent = nil
     end
 
@@ -50,15 +42,12 @@ class PolyTreeNode
     end
 
     def bfs(target)
-        #push unshift
-        # return self if self.value == target
-        # debugger
         queue = [self]
 
         until queue.empty?
            ele = queue.shift
            return ele if ele.value == target
-           ele.children.each { |child| queue << child }
+           queue.concat(ele.children)
         end
         
         nil
